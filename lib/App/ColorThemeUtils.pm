@@ -27,7 +27,8 @@ sub list_color_theme_modules {
     my @res;
     my %resmeta;
 
-    my $mods = PERLANCAR::Module::List::list_modules("", {list_modules => 1});
+    my $mods = PERLANCAR::Module::List::list_modules(
+        "", {list_modules => 1, recurse => 1});
     for my $mod (sort keys %$mods) {
         next unless $mod =~ /::ColorTheme::/;
         push @res, $mod;
@@ -52,6 +53,7 @@ $SPEC{list_color_themes} = {
 };
 sub list_color_themes {
     no strict 'refs';
+    require Color::ANSI::Util;
 
     my %args = @_;
 
@@ -60,7 +62,7 @@ sub list_color_themes {
         push @mods, $args{module};
     } else {
         my $mods = PERLANCAR::Module::List::list_modules(
-            "", {list_modules => 1});
+            "", {list_modules => 1, recurse => 1});
         for my $mod (sort keys %$mods) {
             next unless $mod =~ /::ColorTheme::/;
             push @mods, $mod;
@@ -76,8 +78,18 @@ sub list_color_themes {
         for my $name (sort keys %$themes) {
             my $colors = $themes->{$name}{colors};
             my $colorbar = "";
-            for my $color (sort keys %$colors) {
-                $colorbar .= (length $colorbar ? " " : "") . $color;
+            for my $colorname (sort keys %$colors) {
+                my $color = $colors->{$colorname};
+                $colorbar .= join(
+                    "",
+                    (length $colorbar ? "" : ""),
+                    ref($color) || !length($color) ? ("   ") :
+                        (
+                            Color::ANSI::Util::ansibg($color),
+                            "   ",
+                            "\e[0m",
+                        ),
+                );
             }
             if ($args{detail}) {
                 push @res, {
@@ -86,9 +98,13 @@ sub list_color_themes {
                     colors => $colorbar,
                 };
             } else {
-                push @res, "$mod\::$theme";
+                push @res, "$mod\::$name";
             }
         }
+    }
+
+    if ($args{detail}) {
+        $resmeta{'table.fields'} = [qw/module name colors/];
     }
 
     [200, "OK", \@res, \%resmeta];
