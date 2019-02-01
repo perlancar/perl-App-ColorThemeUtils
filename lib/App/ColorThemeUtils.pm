@@ -54,6 +54,7 @@ $SPEC{list_color_themes} = {
 sub list_color_themes {
     no strict 'refs';
     require Color::ANSI::Util;
+    require PERLANCAR::Module::List;
 
     my %args = @_;
 
