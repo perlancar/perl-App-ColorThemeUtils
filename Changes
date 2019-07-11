@@ -1,8 +1,8 @@
-0.002   2019-02-02 (PERLANCAR)
+0.002   2019-02-02  Released-By: PERLANCAR
 
 	- [bugfix] Forgot to require module before use.
 
 
-0.001   2018-02-25 (PERLANCAR)
+0.001   2018-02-25  Released-By: PERLANCAR
 
         - First release.
