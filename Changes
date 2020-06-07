@@ -1,3 +1,8 @@
+0.004   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux][cli show-color-theme-swatch] Add shortcut aliases -A and -m.
+
+
 0.003   2020-06-07  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to ColorTheme v2 specification.
