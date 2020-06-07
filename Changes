@@ -1,3 +1,12 @@
+0.003   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme v2 specification.
+
+        - Remove CLI list-color-themes.
+
+        - Add CLI show-color-theme-swatch.
+
+
 0.002   2019-02-02  Released-By: PERLANCAR
 
 	- [bugfix] Forgot to require module before use.
