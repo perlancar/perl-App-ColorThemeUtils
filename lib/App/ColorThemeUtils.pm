@@ -47,11 +47,13 @@ $SPEC{show_color_theme_swatch} = {
             schema => 'perl::modname*',
             req => 1,
             pos => 0,
+            cmdline_aliases => {m=>{}},
         },
         module_args => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'module_arg',
             schema => ['hash*', of=>'str*'],
+            cmdline_aliases => {A=>{}},
         },
         width => {
             schema => 'posint*',
