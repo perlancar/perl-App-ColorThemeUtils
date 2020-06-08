@@ -1,3 +1,9 @@
+0.005   2020-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme 2.0.1 (get_color_list renamed to
+	  list_items).
+
+
 0.004   2020-06-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux][cli show-color-theme-swatch] Add shortcut aliases -A and -m.
