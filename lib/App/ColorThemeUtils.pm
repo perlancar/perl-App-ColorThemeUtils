@@ -75,19 +75,19 @@ sub show_color_theme_swatch {
     require $modpm;
 
     my $ctheme = $mod->new(%{ $args{module_args} // {} });
-    my @color_names = $ctheme->get_color_list;
+    my @item_names = $ctheme->list_items;
 
     my $reset = Color::ANSI::Util::ansi_reset();
-    for my $color_name (@color_names) {
+    for my $item_name (@item_names) {
         my $empty_bar = " " x $width;
-        my $color0 = $ctheme->get_color($color_name);
+        my $color0 = $ctheme->get_color($item_name);
         my $color_summary = ref $color0 eq 'HASH' && defined($color0->{summary}) ?
             String::Pad::pad($color0->{summary}, $width, "center", " ", 1) : undef;
         my $fg_color = ref $color0 eq 'HASH' ? $color0->{fg} : $color0;
         my $bg_color = ref $color0 eq 'HASH' ? $color0->{bg} : undef;
         my $color = $fg_color // $bg_color;
         my $text_bar  = String::Pad::pad(
-            "$color_name (".($fg_color // "-").(defined $bg_color ? " on $bg_color" : "").")",
+            "$item_name (".($fg_color // "-").(defined $bg_color ? " on $bg_color" : "").")",
             $width, "center", " ", 1);
         my $bartext_color = Color::RGB::Util::rgb_is_dark($color) ? "ffffff" : "000000";
         my $bar = join(
