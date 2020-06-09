@@ -1,3 +1,8 @@
+0.006   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme 2.1.0.
+
+
 0.005   2020-06-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to ColorTheme 2.0.1 (get_color_list renamed to
