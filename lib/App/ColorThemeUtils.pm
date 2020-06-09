@@ -80,7 +80,7 @@ sub show_color_theme_swatch {
     my $reset = Color::ANSI::Util::ansi_reset();
     for my $item_name (@item_names) {
         my $empty_bar = " " x $width;
-        my $color0 = $ctheme->get_color($item_name);
+        my $color0 = $ctheme->get_item_color($item_name);
         my $color_summary = ref $color0 eq 'HASH' && defined($color0->{summary}) ?
             String::Pad::pad($color0->{summary}, $width, "center", " ", 1) : undef;
         my $fg_color = ref $color0 eq 'HASH' ? $color0->{fg} : $color0;
