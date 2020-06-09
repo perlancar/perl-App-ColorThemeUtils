@@ -43,17 +43,11 @@ sub list_color_theme_modules {
 $SPEC{show_color_theme_swatch} = {
     v => 1.1,
     args => {
-        module => {
-            schema => 'perl::modname*',
+        theme => {
+            schema => 'perl::modname_with_optional_args*',
             req => 1,
             pos => 0,
             cmdline_aliases => {m=>{}},
-        },
-        module_args => {
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'module_arg',
-            schema => ['hash*', of=>'str*'],
-            cmdline_aliases => {A=>{}},
         },
         width => {
             schema => 'posint*',
@@ -65,22 +59,19 @@ $SPEC{show_color_theme_swatch} = {
 sub show_color_theme_swatch {
     require Color::ANSI::Util;
     require Color::RGB::Util;
+    require Module::Load::Util;
     require String::Pad;
 
     my %args = @_;
     my $width = $args{width} // 80;
-    my $mod = $args{module};
-    $mod = "ColorTheme::$mod" unless $mod =~ /(\A|::)ColorTheme::/;
-    (my $modpm = "$mod.pm") =~ s!::!/!g;
-    require $modpm;
 
-    my $ctheme = $mod->new(%{ $args{module_args} // {} });
-    my @item_names = $ctheme->list_items;
+    my $theme = Module::Load::Util::instantiate_class_with_optional_args($args{theme});
+    my @item_names = $theme->list_items;
 
     my $reset = Color::ANSI::Util::ansi_reset();
     for my $item_name (@item_names) {
         my $empty_bar = " " x $width;
-        my $color0 = $ctheme->get_item_color($item_name);
+        my $color0 = $theme->get_item_color($item_name);
         my $color_summary = ref $color0 eq 'HASH' && defined($color0->{summary}) ?
             String::Pad::pad($color0->{summary}, $width, "center", " ", 1) : undef;
         my $fg_color = ref $color0 eq 'HASH' ? $color0->{fg} : $color0;
