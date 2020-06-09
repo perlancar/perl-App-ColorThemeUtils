@@ -1,3 +1,9 @@
+0.007   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible] [cli show-color-theme-swatch] Accept theme module
+	  name with optional args instead of separate -m and -A.
+
+
 0.006   2020-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to ColorTheme 2.1.0.
