@@ -109,6 +109,6 @@ This distribution contains the following CLI utilities:
 
 =head1 SEE ALSO
 
-L<Color::Theme>
+L<ColorTheme>
 
 =cut
