@@ -31,9 +31,9 @@ sub list_color_theme_modules {
     my %resmeta;
 
     my $mods = Module::List::Tiny::list_modules(
-        "", {list_modules => 1, recurse => 1});
+        "ColorTheme::", {list_modules => 1, recurse => 1});
     for my $mod (sort keys %$mods) {
-        next unless $mod =~ /(\A|::)ColorTheme::/;
+        $mod =~ s/\AColorTheme:://;
         push @res, $mod;
     }
 
@@ -65,7 +65,8 @@ sub show_color_theme_swatch {
     my %args = @_;
     my $width = $args{width} // 80;
 
-    my $theme = Module::Load::Util::instantiate_class_with_optional_args($args{theme});
+    my $theme = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefix=>'ColorTheme'}, $args{theme});
     my @item_names = $theme->list_items;
 
     my $reset = Color::ANSI::Util::ansi_reset();
