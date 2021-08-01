@@ -12,6 +12,17 @@ use Log::ger;
 
 our %SPEC;
 
+sub _is_rgb_code {
+    my $code = shift;
+    $code =~ /\A#?[0-9A-Fa-f]{6}\z/;
+}
+
+sub _ansi_code_to_color_name {
+    my $code = shift;
+    $code =~ s/\e\[(.+)m/$1/g;
+    "ansi:$code";
+}
+
 $SPEC{list_color_theme_modules} = {
     v => 1.1,
     summary => 'List ColorTheme modules',
@@ -44,7 +55,7 @@ $SPEC{show_color_theme_swatch} = {
     v => 1.1,
     args => {
         theme => {
-            schema => 'perl::modname_with_optional_args*',
+            schema => 'perl::colortheme::modname_with_optional_args*',
             req => 1,
             pos => 0,
             cmdline_aliases => {m=>{}},
@@ -75,24 +86,47 @@ sub show_color_theme_swatch {
         my $color0 = $theme->get_item_color($item_name);
         my $color_summary = ref $color0 eq 'HASH' && defined($color0->{summary}) ?
             String::Pad::pad($color0->{summary}, $width, "center", " ", 1) : undef;
-        my $fg_color = ref $color0 eq 'HASH' ? $color0->{fg} : $color0;
-        my $bg_color = ref $color0 eq 'HASH' ? $color0->{bg} : undef;
-        my $color = $fg_color // $bg_color;
-        my $text_bar  = String::Pad::pad(
-            "$item_name (".($fg_color // "-").(defined $bg_color ? " on $bg_color" : "").")",
-            $width, "center", " ", 1);
-        my $bartext_color = Color::RGB::Util::rgb_is_dark($color) ? "ffffff" : "000000";
-        my $bar = join(
-            "",
-            Color::ANSI::Util::ansibg($color), $empty_bar, $reset, "\n",
-            Color::ANSI::Util::ansibg($color), Color::ANSI::Util::ansifg($bartext_color), $text_bar, $reset, "\n",
-            defined $color_summary ? (
-                Color::ANSI::Util::ansibg($color), Color::ANSI::Util::ansifg($bartext_color), $color_summary, $reset, "\n",
 
-            ) : (),
-            Color::ANSI::Util::ansibg($color), $empty_bar, $reset, "\n",
-            $empty_bar, "\n",
-        );
+        my $fg_color_code = ref $color0 eq 'HASH' ? ($color0->{ansi_fg} ? $color0->{ansi_fg} : $color0->{fg}) : $color0;
+        my $bg_color_code = ref $color0 eq 'HASH' ? ($color0->{ansi_bg} ? $color0->{ansi_bg} : $color0->{bg}) : undef;
+        die "Error in code for color item '$item_name': at least one of bgcolor or fgcolor must be defined"
+            unless defined $fg_color_code || defined $bg_color_code;
+        my $color_code = $fg_color_code // $bg_color_code;
+
+        my $fg_color_name = !defined($fg_color_code) ? "undef" : _is_rgb_code($fg_color_code) ? "rgb:$fg_color_code" : _ansi_code_to_color_name($fg_color_code);
+        my $bg_color_name = !defined($bg_color_code) ? "undef" : _is_rgb_code($bg_color_code) ? "rgb:$bg_color_code" : _ansi_code_to_color_name($bg_color_code);
+        my $color_name = $fg_color_name // $bg_color_name;
+
+        my $text_bar  = String::Pad::pad(
+            "$item_name ($fg_color_name on $bg_color_name)",
+            $width, "center", " ", 1);
+
+        my $bar;
+        if ($color_name =~ /^rgb:/) {
+            my $bartext_color = Color::RGB::Util::rgb_is_dark($fg_color_code // 'ffffff') ? "ffffff" : "000000";
+            $bar = join(
+                "",
+                Color::ANSI::Util::ansibg($color_code), $empty_bar, $reset, "\n",
+                Color::ANSI::Util::ansibg($color_code), Color::ANSI::Util::ansifg($bartext_color), $text_bar, $reset, "\n",
+                defined $color_summary ? (
+                    Color::ANSI::Util::ansibg($color_code), Color::ANSI::Util::ansifg($bartext_color), $color_summary, $reset, "\n",
+
+                ) : (),
+                Color::ANSI::Util::ansibg($color_code), $empty_bar, $reset, "\n",
+                $empty_bar, "\n",
+            );
+        } else {
+            # color is ansi
+            $bar = join(
+                "",
+                ($fg_color_code // '').($bg_color_code // ''), $empty_bar, $reset, "\n",
+                ($fg_color_code // '').($bg_color_code // ''), $text_bar, $reset, "\n",
+                defined $color_summary ? (
+                    ($fg_color_code // '').($bg_color_code // ''), $color_summary, $reset, "\n",
+                ) : (),
+                $empty_bar, "\n",
+            );
+        }
         print $bar;
     }
     [200];
